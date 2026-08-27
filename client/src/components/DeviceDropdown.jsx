@@ -8,7 +8,7 @@ export default function DeviceDropdown({ onSelectDevice }) {
   const [selectedModelId, setSelectedModelId] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/devices')
+    fetch(`${import.meta.env.VITE_API_URL}/api/devices`)
       .then((res) => res.json())
       .then((data) => {
         setDevices(data);

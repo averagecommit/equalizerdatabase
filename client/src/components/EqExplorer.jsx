@@ -12,7 +12,7 @@ export default function EqExplorer({ device }) {
 
   const fetchProfiles = () => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/eq-profiles/${device.id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/eq-profiles/${device.id}`)
       .then((res) => res.json())
       .then((data) => {
         setProfiles(data);
@@ -31,7 +31,7 @@ export default function EqExplorer({ device }) {
 
   const handleVote = async (profileId, voteValue) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/eq-profiles/${profileId}/vote`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/eq-profiles/${profileId}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ vote_value: voteValue, client_id: getClientId() }),
