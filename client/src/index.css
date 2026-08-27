@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0b0d;
+  --bg-panel: #131316;
+  --bg-panel-2: #1a1a1e;
+  --bg-raised: #202024;
+  --line: #232327;
+  --line-soft: #1c1c20;
+  --text: #f2f1ec;
+  --text-dim: #8b8b92;
+  --text-faint: #55555c;
+  --papaya: #ff8000;
+  --papaya-soft: rgba(255, 128, 0, 0.14);
+  --papaya-line: rgba(255, 128, 0, 0.35);
+  --up: #3ddc84;
+  --down: #ff5c5c;
+
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(1200px 600px at 15% -10%, rgba(255, 128, 0, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(255, 128, 0, 0.04), transparent 55%);
+  background-attachment: fixed;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* subtle track-style scrollbar, matches the telemetry theme without shouting */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-raised);
+  border-radius: 6px;
+  border: 2px solid var(--bg-panel);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--papaya);
+}
+
+/* visible keyboard focus everywhere — accessibility floor, non-negotiable */
+:focus-visible {
+  outline: 2px solid var(--papaya);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+input[type="range"] {
+  accent-color: var(--papaya);
+}
