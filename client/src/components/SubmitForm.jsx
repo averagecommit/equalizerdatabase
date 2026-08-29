@@ -199,11 +199,10 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
                   min="-6"
                   max="6"
                   step="1"
-                  orient="vertical"
                   value={band.gain}
                   onChange={(e) => handleAppGainChange(index, e.target.value)}
-                  className="w-4 h-32 rounded-lg cursor-pointer"
-                  style={{ WebkitAppearance: 'slider-vertical' }}
+                  className="w-4 h-32 rounded-lg cursor-pointer accent-[var(--papaya)]"
+                  style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
                 />
                 <span className="font-mono text-[var(--text-faint)] text-xs">{band.label}</span>
               </div>
@@ -223,8 +222,19 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
               {advancedBands.map((band, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center gap-2 w-[72px] bg-[var(--bg-panel-2)] border border-[var(--line)] rounded-md p-2"
+                  className="relative flex flex-col items-center gap-2 w-[72px] bg-[var(--bg-panel-2)] border border-[var(--line)] rounded-md p-2 pt-5"
                 >
+                  {/* remove this band */}
+                  <button
+                    type="button"
+                    onClick={() => setAdvancedBands(advancedBands.filter((_, i) => i !== index))}
+                    disabled={advancedBands.length === 1}
+                    title="Remove band"
+                    className="absolute top-0.5 right-0.5 w-4 h-4 flex items-center justify-center text-[10px] leading-none text-[var(--text-faint)] hover:text-[var(--down)] disabled:opacity-20 disabled:cursor-not-allowed transition"
+                  >
+                    ✕
+                  </button>
+
                   {/* frequency (editable) */}
                   <input
                     type="number"
@@ -242,8 +252,8 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
                     step="0.1"
                     value={band.gain}
                     onChange={(e) => handleAdvancedBandChange(index, 'gain', e.target.value)}
-                    className="h-40 w-4 rounded-lg cursor-pointer"
-                    style={{ WebkitAppearance: 'slider-vertical' }}
+                    className="h-40 w-4 rounded-lg cursor-pointer accent-[var(--papaya)]"
+                    style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
                   />
 
                   {/* gain value (editable) */}
@@ -277,10 +287,21 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
                   </select>
                 </div>
               ))}
+
+              {/* add a new band */}
+              <button
+                type="button"
+                onClick={() =>
+                  setAdvancedBands([...advancedBands, { filter_type: 'Peak', frequency: 1000, gain: 0, q_factor: 1.41 }])
+                }
+                className="w-[72px] flex items-center justify-center text-[var(--papaya)] font-mono text-xs border border-dashed border-[var(--line)] rounded-md hover:border-[var(--papaya)] transition"
+              >
+                + band
+              </button>
             </div>
           </div>
           <p className="font-mono text-[10px] text-[var(--text-faint)] mt-2">
-            Frequency (Hz) · Gain (dB) · Quality (Q) · Filter type — top to bottom, per band.
+            Frequency (Hz) · Gain (dB) · Quality (Q) · Filter type — top to bottom, per band. Only bands you keep are submitted.
           </p>
         </div>
       )}
