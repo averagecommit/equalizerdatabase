@@ -10,7 +10,13 @@ function App() {
     <div className="min-h-screen flex flex-col items-center px-4 sm:px-6 pb-24">
       {/* HERO */}
       <header className="w-full max-w-5xl pt-16 pb-10 text-center">
-        <h1 className="font-display font-semibold uppercase text-[15vw] sm:text-7xl leading-none tracking-tight text-[var(--text)] inline-block relative">
+        <h1
+          onClick={() => setSelectedDevice(null)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSelectedDevice(null)}
+          className="font-display font-semibold uppercase text-[15vw] sm:text-7xl leading-none tracking-tight text-[var(--text)] inline-block relative cursor-pointer select-none"
+        >
           EQ<span className="text-[var(--papaya)]">db</span>
         </h1>
         {/* signature: single diagonal apex line, used once */}
@@ -44,6 +50,7 @@ function App() {
 
       <Footer
         githubUrl="https://github.com/averagecommit/equalizerdatabase"
+        issuesUrl="https://github.com/averagecommit/equalizerdatabase/issues"
         supportUrl="" // add a Ko-fi / Buy Me a Coffee / GitHub Sponsors link here when ready
       />
     </div>
