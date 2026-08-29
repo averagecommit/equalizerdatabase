@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import pkg from 'pg';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
@@ -22,6 +23,38 @@ pool.connect()
   .catch((err) => console.error('❌ Database connection error:', err.stack));
 
 // ==========================================
+// RATE LIMITERS
+// ==========================================
+// Per-IP throttling to slow down spam/abuse. This is a first line of
+// defense, not a substitute for the client_id vote-dedup logic — a
+// determined spammer can still rotate IPs, but this stops casual abuse
+// and runaway scripts/bots without needing extra infrastructure.
+
+const submitProfileLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many submissions from this network. Please try again later.' },
+});
+
+const voteLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many votes from this network. Please try again later.' },
+});
+
+const deviceRequestLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many device requests from this network. Please try again later.' },
+});
+
+// ==========================================
 // API ROUTES
 // ==========================================
 
@@ -38,7 +71,7 @@ app.get('/api/devices', async (req, res) => {
 });
 
 // 2. Submit a new EQ Profile
-app.post('/api/eq-profiles', async (req, res) => {
+app.post('/api/eq-profiles', submitProfileLimiter, async (req, res) => {
   try {
     const { device_id, submitter_name, title, description, preamp_gain, bands } = req.body;
 
@@ -80,7 +113,7 @@ app.get('/api/eq-profiles/:deviceId', async (req, res) => {
 });
 
 // 4. Vote on an EQ Profile
-app.post('/api/eq-profiles/:id/vote', async (req, res) => {
+app.post('/api/eq-profiles/:id/vote', voteLimiter, async (req, res) => {
   const { id } = req.params;
   const { vote_value, client_id } = req.body; // vote_value: 1 (upvote) or -1 (downvote)
 
@@ -149,7 +182,7 @@ app.post('/api/eq-profiles/:id/vote', async (req, res) => {
 });
 
 // 5. Submit a device request (user's headphone isn't in the dropdown yet)
-app.post('/api/device-requests', async (req, res) => {
+app.post('/api/device-requests', deviceRequestLimiter, async (req, res) => {
   try {
     const { brand, model } = req.body;
 
@@ -171,6 +204,7 @@ app.post('/api/device-requests', async (req, res) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: `🎧 New device request: **${brand.trim()} ${model.trim()}**`,
+          thread_name: `${brand.trim()} ${model.trim()}`, // required if the webhook targets a forum channel
         }),
       }).catch((err) => console.error('Discord webhook failed:', err.message));
     }
