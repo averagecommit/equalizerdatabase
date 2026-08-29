@@ -10,9 +10,16 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [advancedBands, setAdvancedBands] = useState([
-    { filter_type: 'Peak', frequency: 1000, gain: 0, q_factor: 1.41 },
-  ]);
+  const STANDARD_FREQUENCIES = [20, 40, 80, 160, 315, 630, 1000, 2000, 4000, 8000, 12000, 16000];
+
+  const [advancedBands, setAdvancedBands] = useState(
+    STANDARD_FREQUENCIES.map((freq) => ({
+      filter_type: 'Peak',
+      frequency: freq,
+      gain: 0,
+      q_factor: 1.41,
+    }))
+  );
 
   const [appBands, setAppBands] = useState([]);
 
@@ -191,66 +198,74 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
 
       {mode === 'advanced' && (
         <div>
-          <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--text-faint)] border-b border-[var(--line)] pb-3 mb-3">
+          <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--text-faint)] border-b border-[var(--line)] pb-3 mb-4">
             Parametric bands
           </h3>
-          {advancedBands.map((band, index) => (
-            <div
-              key={index}
-              className="flex flex-wrap md:flex-nowrap gap-2 items-center mb-2 bg-[var(--bg-panel-2)] p-2 rounded-md border border-[var(--line)]"
-            >
-              <select
-                value={band.filter_type}
-                onChange={(e) => handleAdvancedBandChange(index, 'filter_type', e.target.value)}
-                className={`${inputClasses} flex-1`}
-              >
-                <option value="Peak">Peak</option>
-                <option value="Low Shelf">Low Shelf</option>
-                <option value="High Shelf">High Shelf</option>
-              </select>
-              <input
-                type="number"
-                step="0.1"
-                value={band.frequency}
-                onChange={(e) => handleAdvancedBandChange(index, 'frequency', e.target.value)}
-                placeholder="Freq (Hz)"
-                className={`${inputClasses} flex-1`}
-              />
-              <input
-                type="number"
-                step="0.1"
-                value={band.gain}
-                onChange={(e) => handleAdvancedBandChange(index, 'gain', e.target.value)}
-                placeholder="Gain (dB)"
-                className={`${inputClasses} flex-1`}
-              />
-              <input
-                type="number"
-                step="0.01"
-                value={band.q_factor}
-                onChange={(e) => handleAdvancedBandChange(index, 'q_factor', e.target.value)}
-                placeholder="Q-Factor"
-                className={`${inputClasses} flex-1`}
-              />
-              <button
-                type="button"
-                onClick={() => setAdvancedBands(advancedBands.filter((_, i) => i !== index))}
-                className="p-2.5 text-[var(--down)] hover:bg-[rgba(255,92,92,0.1)] rounded-md font-bold disabled:opacity-30"
-                disabled={advancedBands.length === 1}
-              >
-                ✕
-              </button>
+
+          <div className="overflow-x-auto">
+            <div className="flex gap-2 min-w-max px-1 pb-2">
+              {advancedBands.map((band, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center gap-2 w-[72px] bg-[var(--bg-panel-2)] border border-[var(--line)] rounded-md p-2"
+                >
+                  {/* frequency (editable) */}
+                  <input
+                    type="number"
+                    step="1"
+                    value={band.frequency}
+                    onChange={(e) => handleAdvancedBandChange(index, 'frequency', e.target.value)}
+                    className="w-full text-center bg-[var(--bg-panel)] border border-[var(--line)] rounded text-[var(--text)] font-mono text-xs py-1 outline-none focus:border-[var(--papaya)]"
+                  />
+
+                  {/* vertical slider */}
+                  <input
+                    type="range"
+                    min="-12"
+                    max="12"
+                    step="0.1"
+                    value={band.gain}
+                    onChange={(e) => handleAdvancedBandChange(index, 'gain', e.target.value)}
+                    className="h-40 w-4 rounded-lg cursor-pointer"
+                    style={{ WebkitAppearance: 'slider-vertical' }}
+                  />
+
+                  {/* gain value (editable) */}
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={band.gain}
+                    onChange={(e) => handleAdvancedBandChange(index, 'gain', e.target.value)}
+                    className="w-full text-center bg-[var(--bg-panel)] border border-[var(--line)] rounded text-[var(--papaya)] font-mono text-xs py-1 outline-none focus:border-[var(--papaya)]"
+                  />
+
+                  {/* Q (editable) */}
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={band.q_factor}
+                    onChange={(e) => handleAdvancedBandChange(index, 'q_factor', e.target.value)}
+                    title="Quality (Q)"
+                    className="w-full text-center bg-[var(--bg-panel)] border border-[var(--line)] rounded text-[var(--text-dim)] font-mono text-xs py-1 outline-none focus:border-[var(--papaya)]"
+                  />
+
+                  {/* filter type */}
+                  <select
+                    value={band.filter_type}
+                    onChange={(e) => handleAdvancedBandChange(index, 'filter_type', e.target.value)}
+                    className="w-full text-center bg-[var(--bg-panel)] border border-[var(--line)] rounded text-[var(--text-dim)] font-mono text-[10px] py-1 outline-none focus:border-[var(--papaya)]"
+                  >
+                    <option value="Peak">Peak</option>
+                    <option value="Low Shelf">Low Shelf</option>
+                    <option value="High Shelf">High Shelf</option>
+                  </select>
+                </div>
+              ))}
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={() =>
-              setAdvancedBands([...advancedBands, { filter_type: 'Peak', frequency: 1000, gain: 0, q_factor: 1.41 }])
-            }
-            className="mt-2 font-mono text-xs uppercase tracking-wide text-[var(--papaya)] hover:underline"
-          >
-            + Add another band
-          </button>
+          </div>
+          <p className="font-mono text-[10px] text-[var(--text-faint)] mt-2">
+            Frequency (Hz) · Gain (dB) · Quality (Q) · Filter type — top to bottom, per band.
+          </p>
         </div>
       )}
 

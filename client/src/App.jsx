@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import DeviceDropdown from './components/DeviceDropdown';
 import EqExplorer from './components/EqExplorer';
+import Footer from './components/Footer';
 
 function App() {
   const [selectedDevice, setSelectedDevice] = useState(null);
@@ -40,6 +41,11 @@ function App() {
           </p>
         </div>
       )}
+
+      <Footer
+        githubUrl="https://github.com/averagecommit/equalizerdatabase"
+        supportUrl="" // add a Ko-fi / Buy Me a Coffee / GitHub Sponsors link here when ready
+      />
     </div>
   );
 }
