@@ -144,6 +144,27 @@ app.post('/api/eq-profiles/:id/vote', async (req, res) => {
   }
 });
 
+// 5. Submit a device request (user's headphone isn't in the dropdown yet)
+app.post('/api/device-requests', async (req, res) => {
+  try {
+    const { brand, model } = req.body;
+
+    if (!brand || !brand.trim() || !model || !model.trim()) {
+      return res.status(400).json({ error: 'Brand and model are required.' });
+    }
+
+    const newRequest = await pool.query(
+      `INSERT INTO device_requests (brand, model) VALUES ($1, $2) RETURNING *`,
+      [brand.trim(), model.trim()]
+    );
+
+    res.json(newRequest.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to submit device request' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`🚀 Server is running on http://localhost:${port}`);
 });

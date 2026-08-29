@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import RequestDeviceForm from './RequestDeviceForm';
 
 export default function DeviceDropdown({ onSelectDevice }) {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showRequestForm, setShowRequestForm] = useState(false);
 
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedModelId, setSelectedModelId] = useState('');
@@ -62,62 +64,76 @@ export default function DeviceDropdown({ onSelectDevice }) {
   }
 
   return (
-    <div className="w-full max-w-3xl bg-[var(--bg-panel)] border border-[var(--line)] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-3">
-      <div className="flex-1 flex flex-col gap-1.5">
-        <label
-          htmlFor="brand"
-          className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)] pl-1"
-        >
-          Brand
-        </label>
-        <div className="relative">
-          <select id="brand" value={selectedBrand} onChange={handleBrandChange} className={selectClasses}>
-            <option value="">Select brand</option>
-            {brands.map((brand) => (
-              <option key={brand} value={brand}>
-                {brand}
+    <div className="w-full max-w-3xl flex flex-col gap-3 items-center">
+      <div className="w-full bg-[var(--bg-panel)] border border-[var(--line)] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-3">
+        <div className="flex-1 flex flex-col gap-1.5">
+          <label
+            htmlFor="brand"
+            className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)] pl-1"
+          >
+            Brand
+          </label>
+          <div className="relative">
+            <select id="brand" value={selectedBrand} onChange={handleBrandChange} className={selectClasses}>
+              <option value="">Select brand</option>
+              {brands.map((brand) => (
+                <option key={brand} value={brand}>
+                  {brand}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-1.5">
+          <label
+            htmlFor="model"
+            className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)] pl-1"
+          >
+            Model
+          </label>
+          <select
+            id="model"
+            value={selectedModelId}
+            onChange={handleModelChange}
+            disabled={!selectedBrand}
+            className={selectClasses}
+          >
+            <option value="">Select model</option>
+            {availableModels.map((device) => (
+              <option key={device.id} value={device.id}>
+                {device.model} ({device.form_factor})
               </option>
             ))}
           </select>
         </div>
+
+        <div className="flex sm:items-end">
+          <button
+            type="button"
+            onClick={handleGo}
+            disabled={!selectedModelId}
+            className="w-full sm:w-auto px-6 py-3 rounded-md font-display font-semibold uppercase tracking-wide text-sm
+                       bg-[var(--papaya)] text-black hover:brightness-110 active:brightness-95
+                       disabled:bg-[var(--bg-raised)] disabled:text-[var(--text-faint)] disabled:cursor-not-allowed
+                       transition"
+          >
+            Go
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-1.5">
-        <label
-          htmlFor="model"
-          className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)] pl-1"
-        >
-          Model
-        </label>
-        <select
-          id="model"
-          value={selectedModelId}
-          onChange={handleModelChange}
-          disabled={!selectedBrand}
-          className={selectClasses}
-        >
-          <option value="">Select model</option>
-          {availableModels.map((device) => (
-            <option key={device.id} value={device.id}>
-              {device.model} ({device.form_factor})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex sm:items-end">
+      {!showRequestForm && (
         <button
           type="button"
-          onClick={handleGo}
-          disabled={!selectedModelId}
-          className="w-full sm:w-auto px-6 py-3 rounded-md font-display font-semibold uppercase tracking-wide text-sm
-                     bg-[var(--papaya)] text-black hover:brightness-110 active:brightness-95
-                     disabled:bg-[var(--bg-raised)] disabled:text-[var(--text-faint)] disabled:cursor-not-allowed
-                     transition"
+          onClick={() => setShowRequestForm(true)}
+          className="font-mono text-xs uppercase tracking-wide text-[var(--text-faint)] hover:text-[var(--papaya)] transition"
         >
-          Go
+          Don't see your device? Request it
         </button>
-      </div>
+      )}
+
+      {showRequestForm && <RequestDeviceForm onClose={() => setShowRequestForm(false)} />}
     </div>
   );
 }
