@@ -5,6 +5,7 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
 
   const [mode, setMode] = useState(hasAppEQ ? 'app' : 'advanced');
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [submitterName, setSubmitterName] = useState('');
   const [preampGain, setPreampGain] = useState(0);
   const [error, setError] = useState('');
@@ -62,6 +63,7 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
       device_id: device.id,
       submitter_name: submitterName,
       title,
+      description,
       preamp_gain: parseFloat(preampGain),
       bands: finalBands,
     };
@@ -124,7 +126,7 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="md:col-span-2 flex flex-col gap-1.5">
           <label className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)]">
             Title *
@@ -135,6 +137,20 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Bass Boost"
+            className={inputClasses}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)] flex justify-between">
+            <span>Description</span>
+            <span className="text-[var(--text-faint)] normal-case tracking-normal">{description.length}/50</span>
+          </label>
+          <input
+            type="text"
+            maxLength={50}
+            value={description}
+            onChange={(e) => setDescription(e.target.value.slice(0, 50))}
+            placeholder="optional, short"
             className={inputClasses}
           />
         </div>
@@ -152,7 +168,7 @@ export default function SubmitForm({ device, onSuccess, onCancel }) {
             className={inputClasses}
           />
         </div>
-        <div className="md:col-span-3 flex flex-col gap-1.5">
+        <div className="md:col-span-4 flex flex-col gap-1.5">
           <label className="font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--text-faint)]">
             Your name (optional)
           </label>

@@ -127,6 +127,9 @@ export default function EqExplorer({ device }) {
                 <h3 className="font-display uppercase text-xl text-[var(--text)] mt-0.5">
                   {activeProfile?.title}
                 </h3>
+                {activeProfile?.description && (
+                  <p className="font-mono text-xs text-[var(--text-dim)] mt-1">{activeProfile.description}</p>
+                )}
               </div>
               {activeProfile && (
                 <button

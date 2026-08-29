@@ -40,17 +40,21 @@ app.get('/api/devices', async (req, res) => {
 // 2. Submit a new EQ Profile
 app.post('/api/eq-profiles', async (req, res) => {
   try {
-    const { device_id, submitter_name, title, preamp_gain, bands } = req.body;
+    const { device_id, submitter_name, title, description, preamp_gain, bands } = req.body;
 
     // Backend Sanity Check: Prevent positive preamp gain to avoid clipping
     if (preamp_gain > 0) {
       return res.status(400).json({ error: 'Preamp gain must be 0 or a negative number.' });
     }
 
+    if (description && description.length > 50) {
+      return res.status(400).json({ error: 'Description must be 50 characters or fewer.' });
+    }
+
     const newProfile = await pool.query(
-      `INSERT INTO eq_profiles (device_id, submitter_name, title, preamp_gain, bands) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [device_id, submitter_name, title, preamp_gain, JSON.stringify(bands)]
+      `INSERT INTO eq_profiles (device_id, submitter_name, title, description, preamp_gain, bands) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [device_id, submitter_name, title, description || null, preamp_gain, JSON.stringify(bands)]
     );
 
     res.json(newProfile.rows[0]);
