@@ -162,6 +162,19 @@ app.post('/api/device-requests', async (req, res) => {
       [brand.trim(), model.trim()]
     );
 
+    // Fire-and-forget notification — a failed webhook should never block the
+    // user's request from being saved, so this is deliberately not awaited
+    // in a way that affects the response, and errors are only logged.
+    if (process.env.DISCORD_WEBHOOK_URL) {
+      fetch(process.env.DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `🎧 New device request: **${brand.trim()} ${model.trim()}**`,
+        }),
+      }).catch((err) => console.error('Discord webhook failed:', err.message));
+    }
+
     res.json(newRequest.rows[0]);
   } catch (err) {
     console.error(err.message);
